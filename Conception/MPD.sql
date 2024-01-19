@@ -17,13 +17,13 @@ CREATE TABLE departement(
 );
 
 CREATE TABLE teacher(
-   id_teacher CHAR(36),
+   id_person CHAR(36),
    rank_teacher CHAR(1) NOT NULL,
    is_referent_teacher BOOLEAN NOT NULL,
    is_departement_director BOOLEAN NOT NULL,
    departement_id CHAR(36) NOT NULL,
-   PRIMARY KEY(id_teacher),
-   FOREIGN KEY(id_teacher) REFERENCES person(id_person),
+   PRIMARY KEY(id_person),
+   FOREIGN KEY(id_person) REFERENCES person(id_person),
    FOREIGN KEY(departement_id) REFERENCES departement(id_departement)
 );
 
@@ -44,11 +44,11 @@ CREATE TABLE school_class(
 );
 
 CREATE TABLE student(
-   id_student CHAR(36),
+   id_person CHAR(36),
    email_student VARCHAR(50) NOT NULL,
    school_class_id CHAR(36) NOT NULL,
-   PRIMARY KEY(id_student),
-   FOREIGN KEY(id_student) REFERENCES person(id_person),
+   PRIMARY KEY(id_person),
+   FOREIGN KEY(id_person) REFERENCES person(id_person),
    FOREIGN KEY(school_class_id) REFERENCES school_class(id_school_class)
 );
 
@@ -64,17 +64,19 @@ CREATE TABLE subject(
 CREATE TABLE grade(
    id_grade CHAR(36),
    value_grade DECIMAL(3,1) NOT NULL,
-   comment_grade VARCHAR(50) NOT NULL,
+   comment_grade VARCHAR(255) NOT NULL,
    subject_id CHAR(36) NOT NULL,
+   student_id CHAR(36) NOT NULL,
    PRIMARY KEY(id_grade),
-   FOREIGN KEY(subject_id) REFERENCES subject(id_subject)
+   FOREIGN KEY(subject_id) REFERENCES subject(id_subject),
+   FOREIGN KEY(student_id) REFERENCES student(id_person)
 );
 
 CREATE TABLE teacher_subject(
    teacher_id CHAR(36),
    subject_id CHAR(36),
    PRIMARY KEY(teacher_id, subject_id),
-   FOREIGN KEY(teacher_id) REFERENCES teacher(id_teacher),
+   FOREIGN KEY(teacher_id) REFERENCES teacher(id_person),
    FOREIGN KEY(subject_id) REFERENCES subject(id_subject)
 );
 
@@ -82,16 +84,8 @@ CREATE TABLE teacher_school_class(
    teacher_id CHAR(36),
    school_class_id CHAR(36),
    PRIMARY KEY(teacher_id, school_class_id),
-   FOREIGN KEY(teacher_id) REFERENCES teacher(id_teacher),
+   FOREIGN KEY(teacher_id) REFERENCES teacher(id_person),
    FOREIGN KEY(school_class_id) REFERENCES school_class(id_school_class)
-);
-
-CREATE TABLE student_grade(
-   student_id CHAR(36),
-   grade_id CHAR(36),
-   PRIMARY KEY(student_id, grade_id),
-   FOREIGN KEY(student_id) REFERENCES student(id_student),
-   FOREIGN KEY(grade_id) REFERENCES grade(id_grade)
 );
 
 CREATE TABLE diary_subject(

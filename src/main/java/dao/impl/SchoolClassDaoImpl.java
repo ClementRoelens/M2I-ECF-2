@@ -36,7 +36,6 @@ public class SchoolClassDaoImpl implements IDao<SchoolClass> {
     }
 
 
-
     @Override
     public SchoolClass create(SchoolClass schoolClass) {
         Session session = sessionFactory.openSession();
@@ -44,10 +43,12 @@ public class SchoolClassDaoImpl implements IDao<SchoolClass> {
         transaction.begin();
 
         try {
+            schoolClass.getDiary().setSchoolClass(schoolClass);
+            session.save(schoolClass.getDiary());
             session.save(schoolClass);
             transaction.commit();
             return schoolClass;
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -71,7 +72,7 @@ public class SchoolClassDaoImpl implements IDao<SchoolClass> {
             query = session.createQuery("FROM SchoolClass");
             schoolClasses = query.list();
             transaction.commit();
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -83,6 +84,58 @@ public class SchoolClassDaoImpl implements IDao<SchoolClass> {
         return schoolClasses;
     }
 
+    public List<SchoolClass> readFromADepartement(String departementId) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.getTransaction();
+        Query<SchoolClass> query;
+        List<SchoolClass> schoolClasses = new ArrayList<>();
+
+        transaction.begin();
+
+        try {
+            query = session.createQuery("FROM SchoolClass WHERE departement_id = :departementId");
+            query.setParameter("departementId",departementId);
+            schoolClasses = query.list();
+            transaction.commit();
+        } catch (Exception e) {
+            System.out.println(e);
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+        } finally {
+            session.close();
+        }
+
+        return schoolClasses;
+    }
+
+    public List<SchoolClass> readFromALevel(int yearLevel) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.getTransaction();
+        Query<SchoolClass> query;
+        List<SchoolClass> schoolClasses = new ArrayList<>();
+
+        transaction.begin();
+
+        try {
+            query = session.createQuery("FROM SchoolClass WHERE year = :yearLevel");
+            query.setParameter("yearLevel",yearLevel);
+            schoolClasses = query.list();
+            transaction.commit();
+        } catch (Exception e) {
+            System.out.println(e);
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+        } finally {
+            session.close();
+        }
+
+        return schoolClasses;
+    }
+
+
+
     @Override
     public SchoolClass read(String id) {
         Session session = sessionFactory.openSession();
@@ -90,8 +143,8 @@ public class SchoolClassDaoImpl implements IDao<SchoolClass> {
         transaction.begin();
 
         try {
-            return session.get(SchoolClass.class,id);
-        }catch (Exception e) {
+            return session.get(SchoolClass.class, id);
+        } catch (Exception e) {
             System.out.println(e);
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -112,7 +165,7 @@ public class SchoolClassDaoImpl implements IDao<SchoolClass> {
             session.delete(id);
             transaction.commit();
             return true;
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             if (transaction.isActive()) {
                 transaction.rollback();

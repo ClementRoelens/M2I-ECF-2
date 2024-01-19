@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "teacher")
-@PrimaryKeyJoinColumn(name = "id_teacher")
+@PrimaryKeyJoinColumn(name = "id_person")
 public class Teacher extends Person {
     @Column(name = "rank_teacher")
     private char rank;

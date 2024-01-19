@@ -15,6 +15,7 @@
         <mapping class="entity.Student"/>
         <mapping class="entity.Subject"/>
         <mapping class="entity.Teacher"/>
+        <mapping class="entity.DiarySubject"/>
     </session-factory>
 
 </hibernate-configuration>

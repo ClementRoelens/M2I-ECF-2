@@ -1,8 +1,7 @@
 package dao.impl;
 
 import dao.IDao;
-import entity.Student;
-import entity.Subject;
+import entity.Grade;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -14,42 +13,46 @@ import org.hibernate.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StudentDaoImpl implements IDao<Student> {
+public class GradeDaoImpl implements IDao<Grade> {
     private StandardServiceRegistry standardServiceRegistry;
     private SessionFactory sessionFactory;
-    private static StudentDaoImpl instance = null;
+    private static GradeDaoImpl instance = null;
     private static Object lock = new Object();
 
 
-    public static StudentDaoImpl getInstance(){
-        if (instance == null){
-            synchronized (lock){
-                instance = new StudentDaoImpl();
+    public static GradeDaoImpl getInstance() {
+        if (instance == null) {
+            synchronized (lock) {
+                instance = new GradeDaoImpl();
             }
         }
         return instance;
     }
 
-    private StudentDaoImpl() {
+
+    private GradeDaoImpl() {
         standardServiceRegistry = new StandardServiceRegistryBuilder().configure().build();
         sessionFactory = new MetadataSources(standardServiceRegistry).buildMetadata().buildSessionFactory();
     }
 
 
 
+
     @Override
-    public Student create(Student student) {
+    public Grade create(Grade grade) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.getTransaction();
         transaction.begin();
 
         try {
-            session.save(student);
-//            student.getSchoolClass().getStudents().add(student);
-//            session.merge(student.getSchoolClass());
+            session.save(grade);
+//            grade.getSubject().getGrades().add(grade);
+//            grade.getStudent().getGrades().add(grade);
+//            session.merge(grade.getSubject());
+//            session.merge(grade.getStudent());
             transaction.commit();
-            return student;
-        } catch (Exception e){
+            return grade;
+        } catch (Exception e) {
             System.out.println(e);
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -61,17 +64,17 @@ public class StudentDaoImpl implements IDao<Student> {
     }
 
     @Override
-    public List<Student> read() {
+    public List<Grade> read() {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.getTransaction();
-        Query<Student> query;
-        List<Student> students = new ArrayList<>();
+        Query<Grade> query;
+        List<Grade> grades = new ArrayList<>();
 
         transaction.begin();
 
         try {
-            query = session.createQuery("FROM Student");
-            students = query.list();
+            query = session.createQuery("FROM Grade");
+            grades = query.list();
             transaction.commit();
         } catch (Exception e) {
             System.out.println(e);
@@ -82,21 +85,21 @@ public class StudentDaoImpl implements IDao<Student> {
             session.close();
         }
 
-        return students;
+        return grades;
     }
 
-    public List<Student> readAllStudentsFromOneClass(String classId){
+    public List<Grade> readAllGradesFromAStudent(String studentId){
         Session session = sessionFactory.openSession();
         Transaction transaction = session.getTransaction();
-        Query<Student> query;
-        List<Student> students = new ArrayList<>();
+        Query<Grade> query;
+        List<Grade> grades = new ArrayList<>();
 
         transaction.begin();
 
         try {
-            query = session.createQuery("FROM Student WHERE school_class_id = :classId");
-            query.setParameter("classId", classId);
-            students = query.list();
+            query = session.createQuery("FROM Grade WHERE student_id = :studentId");
+            query.setParameter("studentId", studentId);
+            grades = query.list();
             transaction.commit();
         } catch (Exception e) {
             System.out.println(e);
@@ -107,17 +110,42 @@ public class StudentDaoImpl implements IDao<Student> {
             session.close();
         }
 
-        return students;
+        return grades;
+    }
+
+    public List<Grade> readAllGradesOfASubject(String subjectId){
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.getTransaction();
+        Query<Grade> query;
+        List<Grade> grades = new ArrayList<>();
+
+        transaction.begin();
+
+        try {
+            query = session.createQuery("FROM Grade WHERE student_id = :subjectId");
+            query.setParameter("subjectId", subjectId);
+            grades = query.list();
+            transaction.commit();
+        } catch (Exception e) {
+            System.out.println(e);
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+        } finally {
+            session.close();
+        }
+
+        return grades;
     }
 
     @Override
-    public Student read(String id) {
+    public Grade read(String id) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.getTransaction();
         transaction.begin();
 
         try {
-            return session.get(Student.class,id);
+            return session.get(Grade.class,id);
         } catch (Exception e) {
             System.out.println(e);
             if (transaction.isActive()) {
@@ -136,7 +164,7 @@ public class StudentDaoImpl implements IDao<Student> {
         transaction.begin();
 
         try {
-            session.delete(id);
+            session.delete(id);;
             transaction.commit();
             return true;
         } catch (Exception e) {

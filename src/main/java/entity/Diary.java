@@ -1,6 +1,7 @@
 package entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,30 +13,32 @@ public class Diary {
     private String id;
     @OneToOne(mappedBy = "diary")
     private SchoolClass schoolClass;
-    @ManyToMany
-    @JoinTable(
-            name = "diary_subject",
-            joinColumns = @JoinColumn(name = "diary_id"),
-            inverseJoinColumns = @JoinColumn(name = "subject_id"))
-    private List<Subject> subjects;
+//    @ManyToMany
+//    @JoinTable(
+//            name = "diary_subject",
+//            joinColumns = @JoinColumn(name = "diary_id"),
+//            inverseJoinColumns = @JoinColumn(name = "subject_id"))
+//    private List<Subject> subjects = new ArrayList<>();
+    @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<DiarySubject> diarySubjects = new ArrayList<>();
 
 
     // Constructeurs
 
 
     public Diary() {
-    }
-
-    public Diary(SchoolClass schoolClass, List<Subject> subjects) {
         this.id = UUID.randomUUID().toString();
-        this.schoolClass = schoolClass;
-        this.subjects = subjects;
     }
 
-    public Diary(String id, SchoolClass schoolClass, List<Subject> subjects) {
-        this.id = id;
+    public Diary(SchoolClass schoolClass, List<DiarySubject> diarySubjects) {
+        this();
         this.schoolClass = schoolClass;
-        this.subjects = subjects;
+        this.diarySubjects = diarySubjects;
+    }
+
+    public Diary(String id, SchoolClass schoolClass, List<DiarySubject> diarySubjects) {
+        this(schoolClass,diarySubjects);
+        this.id = id;
     }
 
 
@@ -58,12 +61,20 @@ public class Diary {
         this.schoolClass = schoolClass;
     }
 
-    public List<Subject> getSubjects() {
-        return subjects;
+//    public List<Subject> getSubjects() {
+//        return subjects;
+//    }
+//
+//    public void setSubjects(List<Subject> subjects) {
+//        this.subjects = subjects;
+//    }
+
+    public List<DiarySubject> getDiarySubjects() {
+        return diarySubjects;
     }
 
-    public void setSubjects(List<Subject> subjects) {
-        this.subjects = subjects;
+    public void setDiarySubjects(List<DiarySubject> diarySubjects) {
+        this.diarySubjects = diarySubjects;
     }
 
 
@@ -72,10 +83,12 @@ public class Diary {
 
     @Override
     public String toString() {
-        return "Diary{" +
-                "id=" + id +
-                ", schoolClass=" + schoolClass +
-                ", subjects=" + subjects +
-                '}';
+        StringBuilder stringBuilder = new StringBuilder("Emploi du temps de la classe de " + schoolClass.getName());
+        stringBuilder.append("\n\n");
+        for (DiarySubject ds : diarySubjects){
+            stringBuilder.append(ds);
+        }
+
+        return stringBuilder.toString();
     }
 }

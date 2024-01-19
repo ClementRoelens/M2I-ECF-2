@@ -1,6 +1,8 @@
 package entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -19,6 +21,8 @@ public class SchoolClass {
     @ManyToOne
     @JoinColumn(name = "departement_id")
     private Departement departement;
+    @OneToMany(mappedBy = "schoolClass", cascade = CascadeType.ALL)
+    private List<Student> students = new ArrayList<>();
 
 
     // Constructeurs
@@ -32,14 +36,16 @@ public class SchoolClass {
         this.name = name;
         this.year = year;
         this.departement = departement;
+        this.diary = new Diary();
     }
 
-    public SchoolClass(String id, String name, int year, Diary diary, Departement departement) {
+    public SchoolClass(String id, String name, int year, Diary diary, Departement departement,List<Student> students ) {
         this.id = id;
         this.name = name;
         this.year = year;
         this.diary = diary;
         this.departement = departement;
+        this.students = students;
     }
 
 
@@ -86,16 +92,20 @@ public class SchoolClass {
         this.departement = departement;
     }
 
+    public List<Student> getStudents() {
+        return students;
+    }
 
-    // Autres méthodes
+    public void setStudents(List<Student> students) {
+        this.students = students;
+    }
+
+
+// Autres méthodes
 
 
     @Override
     public String toString() {
-        return "SchoolClass{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", year=" + year +
-                '}';
+        return String.format("%s - niveau %d\n", name, year);
     }
 }

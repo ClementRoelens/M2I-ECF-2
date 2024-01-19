@@ -1,8 +1,8 @@
 package dao.impl;
 
 import dao.IDao;
-import entity.Student;
-import entity.Subject;
+import entity.Diary;
+import entity.DiarySubject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -14,42 +14,43 @@ import org.hibernate.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StudentDaoImpl implements IDao<Student> {
+public class DiarySubjectDaoImpl implements IDao<DiarySubject> {
     private StandardServiceRegistry standardServiceRegistry;
     private SessionFactory sessionFactory;
-    private static StudentDaoImpl instance = null;
+    private static DiarySubjectDaoImpl instance = null;
     private static Object lock = new Object();
 
 
-    public static StudentDaoImpl getInstance(){
-        if (instance == null){
-            synchronized (lock){
-                instance = new StudentDaoImpl();
+    public static DiarySubjectDaoImpl getInstance() {
+        if (instance == null) {
+            synchronized (lock) {
+                instance = new DiarySubjectDaoImpl();
             }
         }
         return instance;
     }
 
-    private StudentDaoImpl() {
+
+    private DiarySubjectDaoImpl() {
         standardServiceRegistry = new StandardServiceRegistryBuilder().configure().build();
         sessionFactory = new MetadataSources(standardServiceRegistry).buildMetadata().buildSessionFactory();
     }
 
 
 
+
     @Override
-    public Student create(Student student) {
+    public DiarySubject create(DiarySubject diarySubject) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.getTransaction();
         transaction.begin();
 
         try {
-            session.save(student);
-//            student.getSchoolClass().getStudents().add(student);
-//            session.merge(student.getSchoolClass());
+            session.save(diarySubject);
             transaction.commit();
-            return student;
-        } catch (Exception e){
+            return diarySubject;
+
+        } catch (Exception e) {
             System.out.println(e);
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -61,17 +62,17 @@ public class StudentDaoImpl implements IDao<Student> {
     }
 
     @Override
-    public List<Student> read() {
+    public List<DiarySubject> read() {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.getTransaction();
-        Query<Student> query;
-        List<Student> students = new ArrayList<>();
+        Query<DiarySubject> query;
+        List<DiarySubject> diarySubjects = new ArrayList<>();
 
         transaction.begin();
 
         try {
-            query = session.createQuery("FROM Student");
-            students = query.list();
+            query = session.createQuery("FROM DiarySubject");
+            diarySubjects = query.list();
             transaction.commit();
         } catch (Exception e) {
             System.out.println(e);
@@ -82,42 +83,17 @@ public class StudentDaoImpl implements IDao<Student> {
             session.close();
         }
 
-        return students;
-    }
-
-    public List<Student> readAllStudentsFromOneClass(String classId){
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.getTransaction();
-        Query<Student> query;
-        List<Student> students = new ArrayList<>();
-
-        transaction.begin();
-
-        try {
-            query = session.createQuery("FROM Student WHERE school_class_id = :classId");
-            query.setParameter("classId", classId);
-            students = query.list();
-            transaction.commit();
-        } catch (Exception e) {
-            System.out.println(e);
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
-        } finally {
-            session.close();
-        }
-
-        return students;
+        return diarySubjects;
     }
 
     @Override
-    public Student read(String id) {
+    public DiarySubject read(String id) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.getTransaction();
         transaction.begin();
 
         try {
-            return session.get(Student.class,id);
+            return session.get(DiarySubject.class, id);
         } catch (Exception e) {
             System.out.println(e);
             if (transaction.isActive()) {

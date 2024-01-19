@@ -103,6 +103,26 @@ public class DiaryDaoImpl implements IDao<Diary> {
         }
     }
 
+    public boolean update(Diary diary){
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.getTransaction();
+        transaction.begin();
+
+        try {
+            session.merge(diary);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e);
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            return false;
+        } finally {
+            session.close();
+        }
+    }
+
     @Override
     public boolean delete(String id) {
         Session session = sessionFactory.openSession();
